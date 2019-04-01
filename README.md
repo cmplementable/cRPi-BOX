@@ -8,4 +8,4 @@ Raspberry Pi3 pentester box.
 
 <p>В режимі black-box пристрій буде автоматично створювати точку доступу на вбудованій мережевій карті вай-фай, а зовнішня карта з антеною буде використовуватись для пентесту вай-фай мереж. У цьому режимі керування пристроєм відбувається через SSH.<p/>
 <p>У режимі white-box пристрій буде підєднуватися до цільової вай-фай мережі і проводити внутрішній аудит локальної мережі. У цьому режимі керування пристроєм відбувається через SSH або Telegram-бота.</p>
-<p><img src="https://github.com/cRPitonite/cRPi-BOX/blob/master/img/cRPi-BOX%20(square).png" height="300px" width="300px"></p>
+<p align="center"><img src="https://github.com/cRPitonite/cRPi-BOX/blob/master/img/cRPi-BOX%20(square).png" height="500px" width="500px"></p>
