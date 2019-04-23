@@ -1,0 +1,20 @@
+Requirements:
+
+Pass attacks:
+*medusa
+*johnny the ripper
+*pyrit
+
+Post exploitation:
+*mimikatz
+
+Wireless testing:
+*aircrack - ng
+*wifite
+
+Metasploit:
+*metasploit
+
+Network & Port Scanner:
+*nmap
+*recon - ng 
