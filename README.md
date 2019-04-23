@@ -1,4 +1,5 @@
 # cRPi-BOX
+<p><img src='https://github.com/cRPitonite/cRPi-BOX/blob/master/img/crpitonite_cover(twitter).png'></p>
 Raspberry Pi3 pentester box.
 Проект на стадії розробки.
 <h3>АНОТАЦІЯ</h3>
