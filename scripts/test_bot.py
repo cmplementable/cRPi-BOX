@@ -20,70 +20,33 @@
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #  MA 02110-1301, USA.
 #  
-#  
+#
 
+
+import logging
 import re
 import os
-import logging
-import telegram
-from telegram.error import NetworkError, Unauthorized
-from time import sleep
+
+from telegram.ext import Updater
+from telegram.ext import  CallbackQueryHandler
+from telegram.ext import  CommandHandler
+from telegram import  ReplyKeyboardRemove
 
 
-update_id = None
+#import telegramcalendar
 
 
-def main():
-    """Run the bot."""
-    global update_id
-    # Telegram Bot Authorization Token
-    bot = telegram.Bot('ВАШ_ТОКЕН')
-
-    # get the first pending update_id, this is so we can skip over it in case
-    # we get an "Unauthorized" exception.
-    try:
-        update_id = bot.get_updates()[0].update_id
-    except IndexError:
-        update_id = None
-
-    logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-
-    
-
-    while True:
-        try:
-            get_info()
-            sleep(0.5)
-            echo(bot)
-        except NetworkError:
-            sleep(1)
-        except Unauthorized:
-            # The user has removed or blocked the bot.
-            update_id += 1
+TOKEN = ""
 
 
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                    level=logging.INFO)
 
-def echo(bot):
-	
-    """Echo the message the user sent."""
-    
-    
-    global update_id
+logger = logging.getLogger(__name__)
 
-    
-    # Request updates after the last update_id
-    for update in bot.get_updates(offset=update_id, timeout=10):
-        update_id = update.update_id + 1
-
-        if update.message:  # your bot can receive updates without messages
-            # Reply to the message
-            update.message.reply_text('My local IP is: ' + str(ip) + ' ' + str(wifi))
-
-def get_info():
+def get_ip_and_wifi():
     global ip
     global wifi
-    #global get_ip
-    #global get_essid
     #get info about ip and essid
     
     rm_my_location = 'rm my_location.txt'
@@ -102,12 +65,59 @@ def get_info():
             ip = ip[1]
             #wifi
             wifi = f.readline()
-            wifi = re.findall(r'\S+', wifi)
-            wifi = wifi[3]
-            print('My local IP is: ' + str(ip) + ' ' + str(wifi))
+            wifi = re.split('"', wifi)
+            wifi = wifi[1]
+            print('My local IP is: ' + str(ip) + ' WIFI:' + str(wifi))
     except IndexError:
         sleep(3)
-        get_info()
+        get_ip_and_wifi()
 
-if __name__ == '__main__':
-    main()
+def nmap_scan(target):
+	nmap_simple = "nmap -vv " + target
+	print(os.system(nmap_simple))
+
+
+def location_handler(bot,update):
+    get_ip_and_wifi()
+    update.message.reply_text("Getting location: ")
+    update.message.reply_text('My local IP is: ' + str(ip) + ' WIFI:' + str(wifi))
+
+def start_handler(bot, update):
+	update.message.reply_text("Now I can get my location, scan target with nmap. Type /my_location - to get location, /scan <ip> to scan target")
+	
+def help_handler(bot, update):
+	update.message.reply_text("Use /my_location to get IP-address and Wi-Fi ESSID, /scan <target> to scan specific target!")
+	
+def scan_handler(bot, update):
+	try:
+		command = update['message']['text']
+		command = command.split(" ")
+		target = command[1]
+		nmap_scan(target)
+	except IndexError:
+		print("Target not set!!!")
+		update.message.reply_text("Target not set!!! Use /scan <ip>")
+
+"""
+def inline_handler(bot,update):
+    selected,date = telegramcalendar.process_calendar_selection(bot, update)
+    if selected:
+        bot.send_message(chat_id=update.callback_query.from_user.id,
+                        text="You selected %s" % (date.strftime("%d/%m/%Y")),
+                        reply_markup=ReplyKeyboardRemove())
+"""
+
+if TOKEN == "":
+    print("Please write TOKEN into file")
+else:
+    up = Updater(TOKEN)
+
+    up.dispatcher.add_handler(CommandHandler("my_location",location_handler))
+    up.dispatcher.add_handler(CommandHandler("start", start_handler))
+    up.dispatcher.add_handler(CommandHandler("help", help_handler))
+    up.dispatcher.add_handler(CommandHandler("scan", scan_handler))
+    #up.dispatcher.add_handler(CallbackQueryHandler(inline_handler))
+
+    up.start_polling()
+    up.idle()
+
